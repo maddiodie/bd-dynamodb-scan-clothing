@@ -1,14 +1,21 @@
 package com.amazon.ata.dynamodbscanandserialization.scanClothing;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides access to the ClothingStore table.
  */
 public class ClothingDao {
+
     private final DynamoDBMapper mapper;
 
     /**
@@ -20,12 +27,25 @@ public class ClothingDao {
     }
 
     /**
-     * Use the scan() method to retrieve all the items from the ClothingStore table that have a given clothing type.
+     * Use the scan() method to retrieve all the items from the ClothingStore table that have a given
+     * clothing type.
      * @param clothingType the given clothing type
      * @return the list of clothing retrieved from the database
      */
     public List<Clothing> scanByClothingType(final String clothingType) {
-        //TODO: replace the below code
-        return Collections.emptyList();
+        Map<String, AttributeValue> valueMap = new HashMap<>();
+        valueMap.put(":clothingType", new AttributeValue().withS(clothingType));
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+                .withFilterExpression("clothingType = :clothingType")
+                .withExpressionAttributeValues(valueMap);
+        PaginatedScanList<Clothing> filteredClothing = mapper.scan(Clothing.class, scanExpression);
+        return filteredClothing;
     }
+
+    /*
+    You want to be able to search the table and retrieve all the items of a certain clothing type.
+    Implement the method scanByClothingType in ClothingDao that scans the table and returns all the
+    clothing items of a certain type.
+     */
+
 }
